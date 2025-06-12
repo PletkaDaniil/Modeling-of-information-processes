@@ -63,3 +63,5 @@ print("Target position:     ", target_position)
 print("Final position:  ", np.round(eef_position, 4))
 print("Position error: ", np.linalg.norm(np.array(target_position) - np.array(eef_position)))
 print("--"*20)
+
+time.sleep(5)
