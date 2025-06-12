@@ -4,7 +4,7 @@ import pybullet_data
 import numpy as np
 
 guiFlag = True
-target_position = [0.3, 0.5, 2.4]
+target_position = [1.2, 1, 2.3]
 sim_time = 3
 dt = 1 / 240
 
@@ -18,7 +18,6 @@ robot_id = p.loadURDF("two-link.urdf.xml", useFixedBase=True)
 for j in range(p.getNumJoints(robot_id)):
     p.changeDynamics(robot_id, j, linearDamping=0, angularDamping=0)
 
-num_joints = p.getNumJoints(robot_id)
 joint_indices = [0, 1, 3]
 initial_joint_positions = [0.0, 0.0, 0.0]
 
@@ -39,6 +38,8 @@ interpolated_trajectories = [
     for i in range(len(joint_indices))
 ]
 
+joint_trajectory = [[] for _ in joint_indices]
+
 for step in range(num_steps):
     target_pos = [interpolated_trajectories[i][step] for i in range(len(joint_indices))]
     p.setJointMotorControlArray(bodyIndex=robot_id,
@@ -46,11 +47,19 @@ for step in range(num_steps):
                                 controlMode=p.POSITION_CONTROL,
                                 targetPositions=target_pos)
     p.stepSimulation()
+
+    joint_states = p.getJointStates(robot_id, joint_indices)
+    for ind, state in enumerate(joint_states):
+        joint_trajectory[ind].append(state[0])
+
     if guiFlag:
         time.sleep(dt)
 
-time.sleep(1)
-# if guiFlag:
-#     while True:
-#         p.stepSimulation()
-#         time.sleep(dt)
+eef_state = p.getLinkState(robot_id, 4)
+eef_position = eef_state[4]
+
+print("--"*20)
+print("Target position:     ", target_position)
+print("Final position:  ", np.round(eef_position, 4))
+print("Position error: ", np.linalg.norm(np.array(target_position) - np.array(eef_position)))
+print("--"*20)
