@@ -2,6 +2,7 @@ import pybullet as p
 import time
 import pybullet_data
 import numpy as np
+import matplotlib.pyplot as plt
 
 guiFlag = True
 target_position = [1.2, 1, 2.3]
@@ -64,4 +65,15 @@ print("Final position:  ", np.round(eef_position, 4))
 print("Position error: ", np.linalg.norm(np.array(target_position) - np.array(eef_position)))
 print("--"*20)
 
-time.sleep(5)
+time_array = np.linspace(0, sim_time, num_steps)
+plt.figure(figsize=(10, 6))
+for i, joint_traj in enumerate(joint_trajectory):
+    plt.plot(time_array, joint_traj, label=f'Joint {joint_indices[i]}')
+plt.xlabel("Time")
+plt.ylabel("Joint Angle)")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+time.sleep(3)
